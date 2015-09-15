@@ -41,7 +41,7 @@ $ node app.js
 This boilerplate is brought to you and maintained by the following people:
 
 [![Philip La](https://avatars3.githubusercontent.com/u/5875574?s=117)](http://creaturephil.github.io) | [![jd](https://avatars1.githubusercontent.com/u/2987451?s=117)](https://github.com/jd4564)
-:---:|:---:|:---:|:---:|:---:|:---:|:---:
+:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:
 [Philip La](http://creaturephil.github.io) | [jd](https://github.com/jd4564)
 
 ## License
