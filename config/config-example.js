@@ -84,11 +84,19 @@ exports.reportbattles = true;
 //   Note that the feature of turning this off is deprecated.
 exports.reportbattlejoins = true;
 
-// moderated chat - prevent unvoiced users from speaking
-//   This should only be enabled in special situations, such as temporarily
-//   when you're dealing with huge influxes of spammy users.
+// whitelist - prevent users below a certain group from doing things
+//   For the modchat settings, false will allow any user to participate, while a string
+//   with a group symbol will restrict it to that group and above. The string
+//   'autoconfirmed' is also supported for chatmodchat and battlemodchat, to restrict
+//   chat to autoconfirmed users.
+//   This is usually intended to be used as a whitelist feature - set these to '+' and
+//   voice every user you want whitelisted on the server.
+
+// chat modchat - default minimum group for speaking in chatrooms; changeable with /modchat
 exports.chatmodchat = false;
+// battle modchat - default minimum group for speaking in battles; changeable with /modchat
 exports.battlemodchat = false;
+// pm modchat - minimum group for PMing other users, challenging other users, and laddering
 exports.pmmodchat = false;
 
 // forced timer - force the timer on for all battles
@@ -145,27 +153,6 @@ exports.simulatorprocesses = 1;
 // from the `users` array. The default is 1 hour.
 exports.inactiveuserthreshold = 1000 * 60 * 60;
 
-// tellsexpiryage - how long an offline message remains in existence before being removed.
-// By default, 7 days
-exports.tellsexpiryage = 1000 * 60 * 60 * 24 * 7;
-
-// tellrank - the rank that offline messaging is available to. By default, available to voices
-// and above. Set to ' ' to allow all users to use offline messaging and `false` to disable
-// offline messaging completely. Set to `'autoconfirmed'` to allow only autoconfirmed users
-// to send offline messages.
-exports.tellrank = '+';
-
-// database use to store user's money, tickets, etc.
-exports.database = 'lowdb';
-
-// mysql configuration to create the connection to the database.
-exports.mysql = {
-	host: 'localhost',
-	user: 'me',
-	password: 'secret',
-	database: 'my_db'
-};
-
 // Custom avatars.
 // This allows you to specify custom avatar images for users on your server.
 // Place custom avatar files under the /config/avatars/ directory.
@@ -177,9 +164,6 @@ exports.mysql = {
 exports.customavatars = {
 	//'userid': 'customavatar.png'
 };
-
-//Custom avatars appear in profile by specifiying server url.
-exports.avatarurl = '';
 
 // Tournament announcements
 // When tournaments are created in rooms listed below, they will be announced in
@@ -226,6 +210,8 @@ exports.replsocketmode = 0600;
 //     - promote: Promoting and demoting. Will only work if the target user's current
 //                  group and target group are both in jurisdiction.
 //     - room<rank>: /roompromote to <rank> (eg. roomvoice)
+//     - makeroom: Create/delete chatrooms, and set modjoin/roomdesc/privacy
+//     - editroom: Set modjoin/privacy only for battles/groupchats
 //     - ban: Banning and unbanning.
 //     - mute: Muting and unmuting.
 //     - lock: locking (ipmute) and unlocking.
@@ -253,6 +239,17 @@ exports.grouplist = [
 		root: true,
 		globalonly: true
 	},
+  {
+		symbol: '*',
+		id: "jadmin",
+		name: "Junior Administrator",
+      inherit: '&',
+		root: true,
+      rangeban: true,
+		makeroom: true,
+		editroom: true,
+		globalonly: true
+	},
 	{
 		symbol: '&',
 		id: "leader",
@@ -260,13 +257,13 @@ exports.grouplist = [
 		inherit: '@',
 		jurisdiction: '@u',
 		promote: 'u',
+		roommod: true,
+		roomdriver: true,
 		forcewin: true,
 		declare: true,
 		modchatall: true,
-		rangeban: true,
 		potd: true,
 		disableladder: true,
-		globalonly: true,
 		tournamentsmanagement: true
 	},
 	{
@@ -277,6 +274,7 @@ exports.grouplist = [
 		jurisdiction: 'u',
 		roommod: true,
 		roomdriver: true,
+		editroom: true,
 		declare: true,
 		modchatall: true,
 		roomonly: true,
@@ -290,7 +288,7 @@ exports.grouplist = [
 		roomvoice: true,
 		modchat: true,
 		roomonly: true,
-		privateroom: true,
+		editroom: true,
 		joinbattle: true
 	},
 	{
@@ -311,21 +309,25 @@ exports.grouplist = [
 		symbol: '%',
 		id: "driver",
 		name: "Driver",
+      inherit: '$',
+      modlog: true,
+		mute: '\u2605u',
+      alts: '%u',
+		jeopardy: true,
+	},
+  {
+		symbol: '$',
+		id: "operator",
+		name: "Operator",
 		inherit: '+',
 		jurisdiction: 'u',
 		announce: true,
-		warn: true,
+		warn: '\u2605u',
 		kick: true,
-		mute: true,
-		lock: true,
-		forcerename: true,
 		timer: true,
-		modlog: true,
-		alts: '%u',
 		bypassblocks: 'u%@&~',
 		receiveauthmessages: true,
 		tournamentsmoderation: true,
-		jeopardy: true,
 		joinbattle: true
 	},
 	{
@@ -333,11 +335,11 @@ exports.grouplist = [
 		id: "voice",
 		name: "Voice",
 		inherit: ' ',
+		alts: 's',
 		broadcast: true
 	},
 	{
 		symbol: ' ',
-		ip: 's',
-		alts: 's'
+		ip: 's'
 	}
 ];
